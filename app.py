@@ -1115,6 +1115,7 @@
 #     app.run(port=5000)
 from flask import Flask, request, send_file
 import requests
+from urllib.parse import quote
 import os
 
 app = Flask(__name__)
@@ -1244,7 +1245,7 @@ cn unit1"""
 
             if results:
                 for branch, subject, file in results:
-                    pdf_url = f"{BASE_URL}/pdfs/{branch}/{subject}/{file}"
+                    pdf_url = f"{BASE_URL}/pdfs/{branch}/{subject}/{quote(file)}"
 
                     print("Sending:", pdf_url)
 
