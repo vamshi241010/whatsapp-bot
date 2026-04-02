@@ -1113,14 +1113,13 @@
 
 # if __name__ == '__main__':
 #     app.run(port=5000)
-
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_file
 import requests
 import os
 
 app = Flask(__name__)
 
-# 🔐 Use ENV in Render (keep fallback for local testing)
+# 🔐 Use ENV in Render (fallback for local testing)
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN") or "EAAgxFfvcTZBIBRGyZAVFYUp4xuUh1URR3vI5Fwv7ECeZB7I5njJTRhfT9qkxAWexFrLulsNTAUDqocI9dZA8uTDZByT2c0eyboAFuGkbrrzckGZAgyYAjks27tL1ZBpOrdT2HjYS2ZAapWpsGeHQdTJo7UI03fMnTdd8JNMFtGZAFJxsLetWp63MmJjPx8oZCN7vs7SRKfbc0QRopd9d6ZAUL9gkV5pbgZBZBo5S0g08OR8j6y6w7fCZALqenRZArKYZBqsZBdJp1JtIeEZBU51jKOkSZADmastXjmA"
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID") or "1095814390277545"
 VERIFY_TOKEN = "hello123"
@@ -1129,7 +1128,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_FOLDER = os.path.join(BASE_DIR, "pdfs")
 
 # 🌐 Your Render URL
-BASE_URL = "https://whatsapp-bot-1-63hu.onrender.com"
+BASE_URL = "https://whatsapp-bot-ymr2.onrender.com"
 
 
 # 🔥 SMART + FUTURE-PROOF PDF FINDER
@@ -1142,11 +1141,11 @@ def find_pdfs(user_message):
     subject = None
     unit = None
 
-    # 🔹 AUTO DETECT SUBJECT (no hardcoding)
+    # 🔹 Auto-detect subject (no hardcoding)
     if os.path.exists(base_path):
         for folder in os.listdir(base_path):
             if folder.lower() in words:
-                subject = folder  # keeps original case (CN, NMPS...)
+                subject = folder  # keeps original case (CN, NMPS, etc.)
 
     # 🔹 Detect unit
     for i in range(1, 6):
@@ -1171,17 +1170,15 @@ def find_pdfs(user_message):
     return results
 
 
-# 📂 SERVE PDFs (WORKS FOR NESTED FOLDERS)
+# 📂 SERVE PDFs (FINAL FIX USING send_file)
 @app.route('/pdfs/<path:filename>')
 def serve_pdf(filename):
     file_path = os.path.join(PDF_FOLDER, filename)
 
+    print("Serving:", file_path)
+
     if os.path.exists(file_path):
-        return send_from_directory(
-            os.path.dirname(file_path),
-            os.path.basename(file_path),
-            as_attachment=True
-        )
+        return send_file(file_path, as_attachment=True)
     else:
         return "File not found", 404
 
@@ -1226,11 +1223,14 @@ def webhook():
             if msg in ["hi", "hello"]:
                 reply = """👋 Welcome to CSE Bot
 
-📚 Just type:
-- cn
-- cn unit1
-- nmps
-- se"""
+📚 Available Subjects:
+- CN
+- NMPS
+- SE
+
+Try:
+cn
+cn unit1"""
                 requests.post(url, headers=headers, json={
                     "messaging_product": "whatsapp",
                     "to": sender,
@@ -1239,12 +1239,14 @@ def webhook():
                 })
                 return "ok", 200
 
-            # 🔹 FIND PDFs
+            # 🔍 Find PDFs
             results = find_pdfs(message)
 
             if results:
                 for branch, subject, file in results:
                     pdf_url = f"{BASE_URL}/pdfs/{branch}/{subject}/{file}"
+
+                    print("Sending:", pdf_url)
 
                     requests.post(url, headers=headers, json={
                         "messaging_product": "whatsapp",
