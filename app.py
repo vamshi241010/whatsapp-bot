@@ -735,7 +735,8 @@ PHONE_NUMBER_ID = "1095814390277545"
 VERIFY_TOKEN = "hello123"
 
 PDF_FOLDER = "pdfs"
-NGROK_URL = "https://sharply-lepidopterous-penny.ngrok-free.dev"
+# NGROK_URL = "https://sharply-lepidopterous-penny.ngrok-free.dev"
+NGROK_URL = "https://whatsapp-bot-1-63hu.onrender.com"
 
 
 # 🔍 Smart PDF finder
