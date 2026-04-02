@@ -948,36 +948,207 @@
 
 
 
+# from flask import Flask, request, send_from_directory
+# import requests
+# import os
+
+# app = Flask(__name__)
+
+# ACCESS_TOKEN = "EAAgxFfvcTZBIBRGyZAVFYUp4xuUh1URR3vI5Fwv7ECeZB7I5njJTRhfT9qkxAWexFrLulsNTAUDqocI9dZA8uTDZByT2c0eyboAFuGkbrrzckGZAgyYAjks27tL1ZBpOrdT2HjYS2ZAapWpsGeHQdTJo7UI03fMnTdd8JNMFtGZAFJxsLetWp63MmJjPx8oZCN7vs7SRKfbc0QRopd9d6ZAUL9gkV5pbgZBZBo5S0g08OR8j6y6w7fCZALqenRZArKYZBqsZBdJp1JtIeEZBU51jKOkSZADmastXjmA"
+# PHONE_NUMBER_ID = "1095814390277545"
+# VERIFY_TOKEN = "hello123"
+
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# PDF_FOLDER = os.path.join(BASE_DIR, "pdfs")
+
+# NGROK_URL = "https://whatsapp-bot-1-63hu.onrender.com"
+
+
+# # 🔍 Smart PDF finder
+# def find_pdfs(user_message):
+#     msg = user_message.lower()
+#     subjects = ["cn", "nmps", "se"]
+
+#     subject = None
+#     unit = None
+
+#     words = msg.split()
+
+#     for s in subjects:
+#         if s in words:
+#             subject = s
+
+#     for i in range(1, 6):
+#         if f"unit{i}" in msg or f"unit {i}" in msg:
+#             unit = f"unit{i}"
+
+#     results = []
+
+#     if subject:
+#         subject_path = os.path.join(PDF_FOLDER, "cse", subject)
+
+#         print("Checking path:", subject_path)  # debug
+
+#         if os.path.exists(subject_path):
+#             for file in os.listdir(subject_path):
+#                 file_clean = file.lower().replace(" ", "")
+
+#                 if unit:
+#                     if unit in file_clean:
+#                         results.append(("cse", subject, file))
+#                 else:
+#                     results.append(("cse", subject, file))
+
+#     return results
+
+
+# # 📂 FIXED PDF SERVE
+# @app.route('/pdfs/<path:filename>')
+# def serve_pdf(filename):
+#     file_path = os.path.join(PDF_FOLDER, filename)
+
+#     print("Serving file:", file_path)  # debug
+
+#     if os.path.exists(file_path):
+#         return send_from_directory(
+#             os.path.dirname(file_path),
+#             os.path.basename(file_path),
+#             as_attachment=True
+#         )
+#     else:
+#         return "File not found", 404
+
+
+# @app.route('/webhook', methods=['GET', 'POST'])
+# def webhook():
+
+#     if request.method == 'GET':
+#         mode = request.args.get("hub.mode")
+#         token = request.args.get("hub.verify_token")
+#         challenge = request.args.get("hub.challenge")
+
+#         if mode == "subscribe" and token == VERIFY_TOKEN:
+#             return str(challenge), 200
+#         else:
+#             return "Verification failed", 403
+
+#     if request.method == 'POST':
+#         data = request.json
+
+#         try:
+#             message = data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
+#             sender = data['entry'][0]['changes'][0]['value']['messages'][0]['from']
+
+#             msg = message.lower()
+
+#             url = f"https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages"
+
+#             headers = {
+#                 "Authorization": f"Bearer {ACCESS_TOKEN}",
+#                 "Content-Type": "application/json"
+#             }
+
+#             # 💬 Friendly responses
+#             if any(word in msg for word in ["thank", "thanks", "thank you"]):
+#                 reply = "😊 You're welcome! If you need PDFs, just ask!"
+#                 requests.post(url, headers=headers, json={
+#                     "messaging_product": "whatsapp",
+#                     "to": sender,
+#                     "type": "text",
+#                     "text": {"body": reply}
+#                 })
+#                 return "ok", 200
+
+#             if msg in ["hi", "hello"]:
+#                 reply = """👋 Welcome to CSE Bot
+
+# 📚 Subjects:
+# - CN
+# - NMPS
+# - SE
+
+# Try:
+# cn
+# cn unit1"""
+#                 requests.post(url, headers=headers, json={
+#                     "messaging_product": "whatsapp",
+#                     "to": sender,
+#                     "type": "text",
+#                     "text": {"body": reply}
+#                 })
+#                 return "ok", 200
+
+#             # 🔹 PDF SEARCH
+#             results = find_pdfs(message)
+
+#             if results:
+#                 for branch, subject, file in results:
+#                     pdf_url = f"{NGROK_URL}/pdfs/{branch}/{subject}/{file}"
+
+#                     print("Sending:", pdf_url)
+
+#                     requests.post(url, headers=headers, json={
+#                         "messaging_product": "whatsapp",
+#                         "to": sender,
+#                         "type": "document",
+#                         "document": {
+#                             "link": pdf_url,
+#                             "filename": file
+#                         }
+#                     })
+
+#             else:
+#                 requests.post(url, headers=headers, json={
+#                     "messaging_product": "whatsapp",
+#                     "to": sender,
+#                     "type": "text",
+#                     "text": {"body": "❌ No PDFs found"}
+#                 })
+
+#         except Exception as e:
+#             print("Error:", e)
+
+#         return "ok", 200
+
+
+# if __name__ == '__main__':
+#     app.run(port=5000)
+
 from flask import Flask, request, send_from_directory
 import requests
 import os
 
 app = Flask(__name__)
 
-ACCESS_TOKEN = "EAAgxFfvcTZBIBRGyZAVFYUp4xuUh1URR3vI5Fwv7ECeZB7I5njJTRhfT9qkxAWexFrLulsNTAUDqocI9dZA8uTDZByT2c0eyboAFuGkbrrzckGZAgyYAjks27tL1ZBpOrdT2HjYS2ZAapWpsGeHQdTJo7UI03fMnTdd8JNMFtGZAFJxsLetWp63MmJjPx8oZCN7vs7SRKfbc0QRopd9d6ZAUL9gkV5pbgZBZBo5S0g08OR8j6y6w7fCZALqenRZArKYZBqsZBdJp1JtIeEZBU51jKOkSZADmastXjmA"
-PHONE_NUMBER_ID = "1095814390277545"
+# 🔐 Use ENV in Render (keep fallback for local testing)
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN") or "EAAgxFfvcTZBIBRGyZAVFYUp4xuUh1URR3vI5Fwv7ECeZB7I5njJTRhfT9qkxAWexFrLulsNTAUDqocI9dZA8uTDZByT2c0eyboAFuGkbrrzckGZAgyYAjks27tL1ZBpOrdT2HjYS2ZAapWpsGeHQdTJo7UI03fMnTdd8JNMFtGZAFJxsLetWp63MmJjPx8oZCN7vs7SRKfbc0QRopd9d6ZAUL9gkV5pbgZBZBo5S0g08OR8j6y6w7fCZALqenRZArKYZBqsZBdJp1JtIeEZBU51jKOkSZADmastXjmA"
+PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID") or "1095814390277545"
 VERIFY_TOKEN = "hello123"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_FOLDER = os.path.join(BASE_DIR, "pdfs")
 
-NGROK_URL = "https://whatsapp-bot-1-63hu.onrender.com"
+# 🌐 Your Render URL
+BASE_URL = "https://whatsapp-bot-1-63hu.onrender.com"
 
 
-# 🔍 Smart PDF finder
+# 🔥 SMART + FUTURE-PROOF PDF FINDER
 def find_pdfs(user_message):
     msg = user_message.lower()
-    subjects = ["cn", "nmps", "se"]
+    words = msg.split()
+
+    base_path = os.path.join(PDF_FOLDER, "CSE")
 
     subject = None
     unit = None
 
-    words = msg.split()
+    # 🔹 AUTO DETECT SUBJECT (no hardcoding)
+    if os.path.exists(base_path):
+        for folder in os.listdir(base_path):
+            if folder.lower() in words:
+                subject = folder  # keeps original case (CN, NMPS...)
 
-    for s in subjects:
-        if s in words:
-            subject = s
-
+    # 🔹 Detect unit
     for i in range(1, 6):
         if f"unit{i}" in msg or f"unit {i}" in msg:
             unit = f"unit{i}"
@@ -985,9 +1156,7 @@ def find_pdfs(user_message):
     results = []
 
     if subject:
-        subject_path = os.path.join(PDF_FOLDER, "cse", subject)
-
-        print("Checking path:", subject_path)  # debug
+        subject_path = os.path.join(base_path, subject)
 
         if os.path.exists(subject_path):
             for file in os.listdir(subject_path):
@@ -995,19 +1164,17 @@ def find_pdfs(user_message):
 
                 if unit:
                     if unit in file_clean:
-                        results.append(("cse", subject, file))
+                        results.append(("CSE", subject, file))
                 else:
-                    results.append(("cse", subject, file))
+                    results.append(("CSE", subject, file))
 
     return results
 
 
-# 📂 FIXED PDF SERVE
+# 📂 SERVE PDFs (WORKS FOR NESTED FOLDERS)
 @app.route('/pdfs/<path:filename>')
 def serve_pdf(filename):
     file_path = os.path.join(PDF_FOLDER, filename)
-
-    print("Serving file:", file_path)  # debug
 
     if os.path.exists(file_path):
         return send_from_directory(
@@ -1022,16 +1189,13 @@ def serve_pdf(filename):
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
 
+    # 🔹 Verification
     if request.method == 'GET':
-        mode = request.args.get("hub.mode")
-        token = request.args.get("hub.verify_token")
-        challenge = request.args.get("hub.challenge")
+        if request.args.get("hub.verify_token") == VERIFY_TOKEN:
+            return request.args.get("hub.challenge"), 200
+        return "Verification failed", 403
 
-        if mode == "subscribe" and token == VERIFY_TOKEN:
-            return str(challenge), 200
-        else:
-            return "Verification failed", 403
-
+    # 🔹 Message handling
     if request.method == 'POST':
         data = request.json
 
@@ -1048,9 +1212,9 @@ def webhook():
                 "Content-Type": "application/json"
             }
 
-            # 💬 Friendly responses
-            if any(word in msg for word in ["thank", "thanks", "thank you"]):
-                reply = "😊 You're welcome! If you need PDFs, just ask!"
+            # 💬 Friendly replies
+            if any(word in msg for word in ["thank", "thanks"]):
+                reply = "😊 You're welcome!"
                 requests.post(url, headers=headers, json={
                     "messaging_product": "whatsapp",
                     "to": sender,
@@ -1062,14 +1226,11 @@ def webhook():
             if msg in ["hi", "hello"]:
                 reply = """👋 Welcome to CSE Bot
 
-📚 Subjects:
-- CN
-- NMPS
-- SE
-
-Try:
-cn
-cn unit1"""
+📚 Just type:
+- cn
+- cn unit1
+- nmps
+- se"""
                 requests.post(url, headers=headers, json={
                     "messaging_product": "whatsapp",
                     "to": sender,
@@ -1078,14 +1239,12 @@ cn unit1"""
                 })
                 return "ok", 200
 
-            # 🔹 PDF SEARCH
+            # 🔹 FIND PDFs
             results = find_pdfs(message)
 
             if results:
                 for branch, subject, file in results:
-                    pdf_url = f"{NGROK_URL}/pdfs/{branch}/{subject}/{file}"
-
-                    print("Sending:", pdf_url)
+                    pdf_url = f"{BASE_URL}/pdfs/{branch}/{subject}/{file}"
 
                     requests.post(url, headers=headers, json={
                         "messaging_product": "whatsapp",
@@ -1096,13 +1255,14 @@ cn unit1"""
                             "filename": file
                         }
                     })
-
             else:
                 requests.post(url, headers=headers, json={
                     "messaging_product": "whatsapp",
                     "to": sender,
                     "type": "text",
-                    "text": {"body": "❌ No PDFs found"}
+                    "text": {
+                        "body": "❌ No PDFs found.\nTry: cn or cn unit1"
+                    }
                 })
 
         except Exception as e:
