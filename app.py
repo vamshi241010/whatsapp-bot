@@ -780,7 +780,8 @@ def find_pdfs(user_message):
 # 📂 Serve PDFs
 @app.route('/pdfs/<path:filename>')
 def serve_pdf(filename):
-    return send_from_directory(PDF_FOLDER, filename)
+    full_path = os.path.join(PDF_FOLDER, filename)
+    return send_from_directory(os.path.dirname(full_path), os.path.basename(full_path))
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
