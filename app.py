@@ -1213,12 +1213,15 @@ def webhook():
             # 💬 Friendly replies
             if any(word in msg for word in ["thank", "thanks"]):
                 reply = "😊 You're welcome!"
-                requests.post(url, headers=headers, json={
+                response = requests.post(url, headers=headers, json={
                     "messaging_product": "whatsapp",
                     "to": sender,
                     "type": "text",
-                    "text": {"body": reply}
+                    "text": {"body": "Test reply"}
                 })
+
+                print("STATUS:", response.status_code)
+                print("RESPONSE:", response.text)
                 return "ok", 200
 
             if msg in ["hi", "hello"]:
