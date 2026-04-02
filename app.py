@@ -734,7 +734,8 @@ ACCESS_TOKEN = "EAAgxFfvcTZBIBRGyZAVFYUp4xuUh1URR3vI5Fwv7ECeZB7I5njJTRhfT9qkxAWe
 PHONE_NUMBER_ID = "1095814390277545"
 VERIFY_TOKEN = "hello123"
 
-PDF_FOLDER = "pdfs"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PDF_FOLDER = os.path.join(BASE_DIR, "pdfs")
 # NGROK_URL = "https://sharply-lepidopterous-penny.ngrok-free.dev"
 NGROK_URL = "https://whatsapp-bot-1-63hu.onrender.com"
 
